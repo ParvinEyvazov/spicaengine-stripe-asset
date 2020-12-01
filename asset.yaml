@@ -180,3 +180,103 @@ spec:
       bucket:
         resourceFieldRef:
           bucketName: plan
+---
+# FUNCTION
+apiVersion: function/v1
+kind: Function
+metadata:
+  name: stripe-function
+spec:
+  title: Stripe Functions
+  description: Stripe Functions description
+  code: ./function/trigger.js
+  runtime:
+    name: Node
+    language: Javascript
+  dependency:
+    - name: "@spica-devkit/bucket"
+    - version: latest
+    - name: "node-fetch"
+    - version: latest
+    - name: stripe
+    - version: latest
+---
+# CUSTOMER TRIGGER
+apiVersion: function/v1
+kind: Trigger
+metadata:
+  name: customer-trigger
+spec:
+  name: customer
+  func: stripe-function
+  type: bucket
+  bucketOptions:
+    bucket:
+      resourceFieldRef:
+        bucketName: customer
+    phase: AFTER
+    type: INSERT
+---
+# PAYMENT METHOD TRIGGER
+apiVersion: function/v1
+kind: Trigger
+metadata:
+  name: payment-method-trigger
+spec:
+  name: paymentMethod
+  func: stripe-function
+  type: bucket
+  bucketOptions:
+    bucket:
+      resourceFieldRef:
+        bucketName: payment-method
+    phase: AFTER
+    type: INSERT
+---
+# PAYMENT TRIGGER
+apiVersion: function/v1
+kind: Trigger
+metadata:
+  name: payment-trigger
+spec:
+  name: payment
+  func: stripe-function
+  type: bucket
+  bucketOptions:
+    bucket:
+      resourceFieldRef:
+        bucketName: payment
+    phase: AFTER
+    type: INSERT
+---
+# PRODUCT TRIGGER
+apiVersion: function/v1
+kind: Trigger
+metadata:
+  name: product-trigger
+spec:
+  name: product
+  func: stripe-function
+  type: bucket
+  bucketOptions:
+    bucket:
+      resourceFieldRef:
+        bucketName: product
+    phase: AFTER
+    type: INSERT
+---
+# PLAN TRIGGER
+apiVersion: function/v1
+kind: Trigger
+metadata:
+  name: plan-trigger
+spec:
+  name: plan
+  func: stripe-function
+  type: bucket
+  bucketOptions:
+    bucket:
+      resourceFieldRef:
+        bucketName: plan
+    phase: AFTER
+    type: INSERT

@@ -214,23 +214,23 @@ spec:
     - name: CUSTOMER_BUCKET_ID
       valueFrom:
         resourceFieldRef:
-          bucketName: customer
+          schemaName: customer
     - name: PAYMENT_METHOD_ID
       valueFrom:
         resourceFieldRef:
-          bucketName: payment-method
+          schemaName: payment-method
     - name: PRODUCT_BUCKET_ID
       valueFrom:
         resourceFieldRef:
-          bucketName: product
+          schemaName: product
     - name: PLAN_BUCKET_ID
       valueFrom:
         resourceFieldRef:
-          bucketName: plan
+          schemaName: plan
     - name: PAYMENT_BUCKET_ID
       valueFrom:
         resourceFieldRef:
-          bucketName: payment
+          schemaName: payment
   dependency:
     - name: "@spica-devkit/bucket"
       version: latest
@@ -251,7 +251,7 @@ spec:
   bucketOptions:
     bucket:
       resourceFieldRef:
-        bucketName: customer
+        schemaName: customer
     phase: AFTER
     type: INSERT
 ---
@@ -267,7 +267,7 @@ spec:
   bucketOptions:
     bucket:
       resourceFieldRef:
-        bucketName: payment-method
+        schemaName: payment-method
     phase: AFTER
     type: INSERT
 ---
@@ -283,7 +283,7 @@ spec:
   bucketOptions:
     bucket:
       resourceFieldRef:
-        bucketName: payment
+        schemaName: payment
     phase: AFTER
     type: INSERT
 ---
@@ -299,7 +299,7 @@ spec:
   bucketOptions:
     bucket:
       resourceFieldRef:
-        bucketName: product
+        schemaName: product
     phase: AFTER
     type: INSERT
 ---
@@ -315,6 +315,6 @@ spec:
   bucketOptions:
     bucket:
       resourceFieldRef:
-        bucketName: plan
+        schemaName: plan
     phase: AFTER
     type: INSERT

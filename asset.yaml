@@ -1,3 +1,4 @@
+# CUSTOMER BUCKET
 apiVersion: bucket/v1
 kind: Schema
 metadata:
@@ -24,3 +25,158 @@ spec:
         - creating
         - done
         - error
+---
+# PAYMENT METHOD BUCKET
+apiVersion: bucket/v1
+kind: Schema
+metadata:
+  name: payment-method
+spec:
+  title: ASSET-Payment Method
+  description: ASSET-Payment Method description
+  required:
+    - payment_method_id
+  acl:
+    write: "true==true"
+    read: "true=true"
+  properties:
+    customer:
+      type: relation
+      relationType: onetoone
+      bucket:
+        resourceFieldRef:
+          bucketName: customer
+    payment_method_id:
+      type: string
+    status:
+      type: string
+      default: creating
+      enum:
+        - creating
+        - done
+        - error
+    default:
+      type: boolean
+      default: false
+---
+# PRODUCT BUCKET
+apiVersion: bucket/v1
+kind: Schema
+metadata:
+  name: product
+spec:
+  title: ASSET-Product
+  description: ASSET-Product description
+  required:
+    - name
+  acl:
+    write: "true==true"
+    read: "true=true"
+  properties:
+    name:
+      type: string
+    status:
+      type: string
+      default: creating
+      enum:
+        - creating
+        - done
+        - error
+    product_id:
+      type: string
+---
+# PLAN BUCKET
+apiVersion: bucket/v1
+kind: Schema
+metadata:
+  name: plan
+spec:
+  title: ASSET-Plan
+  description: ASSET-Plan description
+  required:
+    - currency
+    - interval
+    - product
+    - amount
+  acl:
+    write: "true==true"
+    read: "true=true"
+  properties:
+    product:
+      type: relation
+      bucket:
+        resourceFieldRef:
+          bucketName: product
+    interval:
+      type: string
+      default: month
+      enum:
+        - day
+        - week
+        - month
+        - year
+  amount:
+    type: number
+  currency:
+    type: string
+    default: usd
+  status:
+    type: string
+    default: creating
+    enum:
+      - creating
+      - done
+      - error
+  price_id:
+    type: string
+    description: Filled AUTOMATICALLY
+---
+# PAYMENT BUCKET
+apiVersion: bucket/v1
+kind: Schema
+metadata:
+  name: payment
+spec:
+  title: ASSET-Payment
+  description: ASSET-Payment description
+  required:
+    - payment_type
+  acl:
+    write: "true==true"
+    read: "true=true"
+  properties:
+    customer:
+      type: relation
+      bucket:
+        resourceFieldRef:
+          bucketName: customer
+    payment_method:
+      type: relation
+      bucket:
+        resourceFieldRef:
+          bucketName: payment-method
+    payment_type:
+      type: string
+      enum:
+        - subscribe
+        - invoice
+        - charge
+    token:
+      type: string
+    price:
+      type: number
+    currency:
+      type: string
+      default: usd
+    status:
+      type: string
+      default: creating
+      enum:
+        - creating
+        - done
+        - error
+    plan:
+      type: relation
+      bucket:
+        resourceFieldRef:
+          bucketName: plan

@@ -181,6 +181,16 @@ spec:
         resourceFieldRef:
           bucketName: plan
 ---
+# API KEY
+apiVersion: passport/v1
+kind: ApiKey
+metadata:
+  name: access-to-buckets-apikey
+spec:
+  name: Secret Api Key For Stripe Asset
+  policies:
+    - BucketFullAccess
+---
 # FUNCTION
 apiVersion: function/v1
 kind: Function
@@ -193,6 +203,25 @@ spec:
   runtime:
     name: Node
     language: Javascript
+  environment:
+    - name: SECRET_API_KEY
+      valueFrom:
+        resourceFieldRef:
+          apiKeyName: access-to-buckets-apikey
+    - name: STRIPE_TEST
+      value: "stripe secret test here"
+    - name: CUSTOMER_BUCKET_ID
+      valueFrom:
+        resourceFieldRef:
+          bucketName: customer
+    - name: PAYMENT_METHOD_ID
+      valueFrom:
+        resourceFieldRef:
+          bucketName: payment-method
+    - name: PRODUCT_BUCKET_ID
+      valueFrom:
+        resourceFieldRef:
+          bucketName: product
   dependency:
     - name: "@spica-devkit/bucket"
       version: latest

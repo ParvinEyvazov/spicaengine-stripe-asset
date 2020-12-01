@@ -199,6 +199,7 @@ metadata:
 spec:
   title: Stripe Functions
   description: Stripe Functions description
+  timeout: 50
   code: ./function/triggers.js
   runtime:
     name: Node
@@ -222,6 +223,14 @@ spec:
       valueFrom:
         resourceFieldRef:
           bucketName: product
+    - name: PLAN_BUCKET_ID
+      valueFrom:
+        resourceFieldRef:
+          bucketName: plan
+    - name: PAYMENT_BUCKET_ID
+      valueFrom:
+        resourceFieldRef:
+          bucketName: payment
   dependency:
     - name: "@spica-devkit/bucket"
       version: latest

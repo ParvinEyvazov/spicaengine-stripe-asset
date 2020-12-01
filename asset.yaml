@@ -189,17 +189,17 @@ metadata:
 spec:
   title: Stripe Functions
   description: Stripe Functions description
-  code: ./function/trigger.js
+  code: ./function/triggers.js
   runtime:
     name: Node
     language: Javascript
   dependency:
     - name: "@spica-devkit/bucket"
-    - version: latest
+      version: latest
     - name: "node-fetch"
-    - version: latest
+      version: latest
     - name: stripe
-    - version: latest
+      version: latest
 ---
 # CUSTOMER TRIGGER
 apiVersion: function/v1

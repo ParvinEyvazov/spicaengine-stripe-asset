@@ -18,9 +18,11 @@ spec:
       type: string
     stripe_customer_id:
       type: string
+      description: DO NOT TOUCH!  IT WILL BE FILLED AUTOMATICALLY!
     status:
       type: string
       default: creating
+      description: DO NOT TOUCH!  IT WILL CHANGED AUTOMATICALLY!
       enum:
         - creating
         - done
@@ -36,6 +38,7 @@ spec:
   description: ASSET-Payment Method description
   required:
     - payment_method_id
+    - customer
   acl:
     write: "true==true"
     read: "true=true"
@@ -43,14 +46,17 @@ spec:
     customer:
       type: relation
       relationType: onetoone
+      description: SELECT THE CUSTOMER OF THIS PAYMENT METHOD!
       bucket:
         resourceFieldRef:
           bucketName: customer
     payment_method_id:
       type: string
+      description: WRITE PAYMENT METHOD ID OF THIS CUSTOMER
     status:
       type: string
       default: creating
+      description: DO NOT TOUCH!  IT WILL BE CHANGED AUTOMATICALLY!
       enum:
         - creating
         - done
@@ -58,6 +64,7 @@ spec:
     default:
       type: boolean
       default: false
+      description: SELECT THIS IF YOU WANT THIS PAYMENT METHOD TO BE DEFAULT FOR THIS CUSTOMER.
 ---
 # PRODUCT BUCKET
 apiVersion: bucket/v1
@@ -65,6 +72,8 @@ kind: Schema
 metadata:
   name: product
 spec:
+  required:
+    - name
   title: ASSET-Product
   description: ASSET-Product description
   required:
@@ -75,15 +84,18 @@ spec:
   properties:
     name:
       type: string
+      description: NAME OF PRODUCT
     status:
       type: string
       default: creating
+      description: DO NOT TOUCH!  IT WILL BE CHANGED AUTOMATICALLY!
       enum:
         - creating
         - done
         - error
     product_id:
       type: string
+      description: DO NOT TOUCH!  IT WILL BE FILLED AUTOMATICALLY!
 ---
 # PLAN BUCKET
 apiVersion: bucket/v1
@@ -104,32 +116,37 @@ spec:
   properties:
     product:
       type: relation
+      description: SELECT A PRODUCT FOR THIS PLAN
       bucket:
         resourceFieldRef:
           bucketName: product
     interval:
       type: string
       default: month
+      description: PAYING INTERVAL
       enum:
         - day
         - week
         - month
         - year
-  amount:
-    type: number
-  currency:
-    type: string
-    default: usd
-  status:
-    type: string
-    default: creating
-    enum:
-      - creating
-      - done
-      - error
-  price_id:
-    type: string
-    description: Filled AUTOMATICALLY
+    amount:
+      type: number
+      description: AMOUNT OF MONEY
+    currency:
+      type: string
+      description: CURRENCY OF MONEY
+      default: usd
+    status:
+      type: string
+      default: creating
+      description: DO NOT TOUCH!  IT WILL BE CHANGED AUTOMATICALLY!
+      enum:
+        - creating
+        - done
+        - error
+    price_id:
+      type: string
+      description: DO NOT TOUCH!  IT WILL BE FILLED AUTOMATICALLY!
 ---
 # PAYMENT BUCKET
 apiVersion: bucket/v1
@@ -147,39 +164,50 @@ spec:
   properties:
     customer:
       type: relation
+      description: SELECT WHEN - CHARGE -
       bucket:
         resourceFieldRef:
           bucketName: customer
     payment_method:
       type: relation
+      description: SELECT WHEN - SUBSCRIBE - AND CUSTOMER HAS NO DEFAULT PAYMENT
       bucket:
         resourceFieldRef:
           bucketName: payment-method
     payment_type:
       type: string
+      description: SELECT PAYMENT TYPE
       enum:
         - subscribe
         - invoice
         - charge
     token:
       type: string
+      description: FILL WHEN - CHARGE -
     price:
       type: number
+      description: FILL WHEN - CHARGE -
     currency:
       type: string
+      description: SELECT WHEN - CHARGE -
       default: usd
     status:
       type: string
       default: creating
+      description: DO NOT TOUCH!  IT WILL BE FILLED AUTOMATICALLY!
       enum:
         - creating
         - done
         - error
     plan:
       type: relation
+      description: SELECT WHEN - SUBSCRIBE -
       bucket:
         resourceFieldRef:
           bucketName: plan
+    subscribe_id:
+      type: string
+      description: DO NOT TOUCH!  IT WILL BE FILLED AUTOMATICALLY WHEN SUBSCRIBING.
 ---
 # API KEY
 apiVersion: passport/v1
@@ -318,3 +346,67 @@ spec:
         schemaName: plan
     phase: AFTER
     type: INSERT
+---
+# Delete Payment Method
+apiVersion: function/v1
+kind: Trigger
+metadata:
+  name: delete-payment-method-trigger
+spec:
+  name: deletePaymentMethod
+  func: stripe-function
+  type: bucket
+  bucketOptions:
+    bucket:
+      resourceFieldRef:
+        schemaName: payment-method
+    phase: AFTER
+    type: DELETE
+---
+# Delete Product
+apiVersion: function/v1
+kind: Trigger
+metadata:
+  name: delete-product-trigger
+spec:
+  name: deleteProduct
+  func: stripe-function
+  type: bucket
+  bucketOptions:
+    bucket:
+      resourceFieldRef:
+        schemaName: product
+    phase: AFTER
+    type: DELETE
+---
+# Delete Payment
+apiVersion: function/v1
+kind: Trigger
+metadata:
+  name: delete-payment-trigger
+spec:
+  name: deletePayment
+  func: stripe-function
+  type: bucket
+  bucketOptions:
+    bucket:
+      resourceFieldRef:
+        schemaName: payment
+    phase: AFTER
+    type: DELETE
+---
+# Delete Plan
+apiVersion: function/v1
+kind: Trigger
+metadata:
+  name: delete-plan-trigger
+spec:
+  name: deletePlan
+  func: stripe-function
+  type: bucket
+  bucketOptions:
+    bucket:
+      resourceFieldRef:
+        schemaName: plan
+    phase: AFTER
+    type: DELETE

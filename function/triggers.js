@@ -93,16 +93,20 @@ export async function invoice(payment) {
 }
 
 export async function subscribe(payment_bucket_data, payment) {
+    const information = {
+        customer: payment.customer.stripe_customer_id,
+        items: [{ plan: payment.plan.price_id }]
+    };
+
+    payment.payment_method
+        ? (information.default_payment_method = payment.payment_method.payment_method_id)
+        : null;
+
     await stripe.subscriptions
-        .create({
-            customer: payment.customer.stripe_customer_id,
-            items: [{ plan: payment.plan.price_id }],
-            default_payment_method: payment.payment_method
-                ? payment.payment_method.payment_method_id
-                : null
-        })
+        .create(information)
         .then(data => {
             payment_bucket_data.status = "done";
+            payment_bucket_data.subscribe_id = data.id;
             console.log("SUCCESSFULLY SUBSCRIPTION STARTED", data, " on payment: ", payment);
         })
         .catch(error => {
@@ -113,6 +117,30 @@ export async function subscribe(payment_bucket_data, payment) {
         .update(`${PAYMENT_BUCKET_ID}`, payment_bucket_data._id, payment_bucket_data)
         .then(_ => {
             console.log("Database updated for starting subscription", _);
+        });
+}
+
+export async function deletePayment(action) {
+    const payment = action.previous;
+    Bucket.initialize({ apikey: `${SECRET_API_KEY}` });
+
+    //deleting subsciption
+    if (payment.status == "done" && payment.payment_type == "subscribe") {
+        await deleteSubsciption(payment.subscribe_id);
+    }
+}
+
+export async function deleteSubsciption(subscribe_id) {
+    await stripe.subscriptions
+        .del(`${payment.subscribe_id}`, {
+            prorate: true,
+            invoice_now: true
+        })
+        .then(data => {
+            console.log("Subsciption cancelled.", data);
+        })
+        .catch(error => {
+            console.log("Error while cancelling subscription.", error);
         });
 }
 
@@ -191,6 +219,20 @@ export async function paymentMethod(action) {
         });
 }
 
+export async function deletePaymentMethod(action) {
+    __construct();
+    const payment = action.previous;
+
+    await stripe.paymentMethods
+        .detach(`${payment.payment_method_id}`)
+        .then(data => {
+            console.log("Payment method deleted.", data);
+        })
+        .catch(error => {
+            console.log(traceID, "ERROR. Payment method delete error: ", error);
+        });
+}
+
 export async function product(action) {
     Bucket.initialize({ apikey: `${SECRET_API_KEY}` });
     const product = action.current;
@@ -213,6 +255,20 @@ export async function product(action) {
         })
         .catch(error => {
             console.log("Error while database updating", error);
+        });
+}
+
+export async function deleteProduct(action) {
+    __construct();
+    const product = action.previous;
+
+    await stripe.products
+        .del(`${product.product_id}`)
+        .then(data => {
+            console.log("Product deleted.", data);
+        })
+        .catch(err => {
+            console.log(traceID, "ERROR. Product delete error: ", error);
         });
 }
 
@@ -256,6 +312,21 @@ export async function plan(action) {
         })
         .catch(error => {
             console.log("Error while updating database in adding new plan");
+        });
+}
+
+export async function deletePlan(action) {
+    __construct();
+    const plan = action.previous;
+    console.log("plan: ", plan);
+
+    await stripe.plans
+        .del(`${plan.price_id}`)
+        .then(data => {
+            console.log("Plan deleted.", data);
+        })
+        .catch(err => {
+            console.log(traceID, "ERROR. Plan delete error: ", error);
         });
 }
 

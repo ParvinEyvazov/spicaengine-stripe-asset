@@ -1,3 +1,4 @@
+import * as jsonpatch from "fast-json-patch/index.mjs";
 const fetch = require("node-fetch");
 //import * as Bucket from "@spica-devkit/bucket";
 const Bucket = require("@spica-devkit/bucket");
@@ -23,6 +24,7 @@ const PAYMENT_METHOD_ID = "5fc4a1d7e33425002ce4a859";
 const PAYMENT_BUCKET_ID = "5fc4be43e33425002ce4a937";
 const PRODUCT_BUCKET_ID = "5fc4eecde33425002ce4a9a0";
 const PLAN_BUCKET_ID = "5fc4f49ae33425002ce4a9b2";
+const CARD_BUCKET_ID = "5fe45d8bdfdd0f002c91f036";
 
 export async function payment(action) {
     //get data
@@ -59,27 +61,53 @@ export async function payment(action) {
 
 export async function charge(payment_bucket_data, payment) {
     Bucket.initialize({ apikey: `${SECRET_API_KEY}` });
-    const { price, currency, token } = payment;
 
-    const amount = price * 100;
+    //with charge token
+    if (payment.token) {
+        const { price, currency, token } = payment;
 
-    await stripe.charges
-        .create({
-            amount: amount,
-            currency: currency,
-            description: "Example charge",
-            source: token,
-            statement_descriptor: "Custom descriptor"
-        })
-        .then(data => {
-            payment_bucket_data.status = "done";
+        const amount = price * 100;
+        await stripe.charges
+            .create({
+                amount: amount,
+                currency: currency,
+                description: "Example charge",
+                source: token,
+                statement_descriptor: "Custom descriptor"
+            })
+            .then(data => {
+                payment_bucket_data.status = "done";
 
-            console.log("SUCCESSFULLY PAID", data, " on payment: ", payment);
-        })
-        .catch(error => {
-            payment_bucket_data.status = "error";
-            console.log("ERROR WHILE PAYING", error, " on payment: ", payment);
-        });
+                console.log("SUCCESSFULLY PAID", data, " on payment: ", payment);
+            })
+            .catch(error => {
+                payment_bucket_data.status = "error";
+                console.log("ERROR WHILE PAYING", error, " on payment: ", payment);
+            });
+    }
+    //with customer information
+    else {
+        const { price, currency, customer } = payment;
+
+        const amount = price * 100;
+        await stripe.charges
+            .create({
+                amount: amount,
+                currency: currency,
+                description: "Charge with customer information",
+                customer: customer.stripe_customer_id,
+                source: payment.card.card_id,
+                statement_descriptor: "Custom descriptor"
+            })
+            .then(data => {
+                payment_bucket_data.status = "done";
+                console.log("SUCCESSFULLY PAID WITH CUSTOMER", data, " on payment: ", payment);
+            })
+            .catch(error => {
+                payment_bucket_data.status = "error";
+                console.log("ERROR WHILE PAYING WITH CUSTOMER", error, " on payment: ", payment);
+            });
+    }
 
     await Bucket.data
         .update(`${PAYMENT_BUCKET_ID}`, payment_bucket_data._id, payment_bucket_data)
@@ -338,4 +366,56 @@ export async function paymentMethodDefaultUpdate(action) {
             invoice_settings: { default_payment_method: payment.payment_method_id }
         });
     }
+}
+
+//new
+export async function card(action) {
+    Bucket.initialize({ apikey: `${SECRET_API_KEY}` });
+    const card_data = action.current;
+    const card_array = await Bucket.data.getAll(`${CARD_BUCKET_ID}`, {
+        queryParams: {
+            filter: {
+                _id: card_data._id
+            },
+            relation: true
+        }
+    });
+    const card = card_array[0];
+    await stripe.customers
+        .createSource(`${card.customer.stripe_customer_id}`, {
+            source: `${card.token}`
+        })
+        .then(data => {
+            card_data.status = "done";
+            card_data.card_id = data.id;
+            console.log("CARD CREATED FOR CUSTOMER", data);
+        })
+        .catch(error => {
+            card_data.status = "error";
+            console.log("ERROR WHILE CARD CREATING FOR CUSTOMER", data);
+        });
+    await Bucket.data
+        .update(`${CARD_BUCKET_ID}`, card_data._id, card_data)
+        .then(data => {
+            console.log("CARD DATA UPDATED", data);
+        })
+        .catch(error => {
+            console.log("ERROR WHILE UPDATED CARD DATA", error);
+        });
+}
+
+export async function deleteCard(action) {
+    Bucket.initialize({ apikey: `${SECRET_API_KEY}` });
+    const card = action.previous;
+
+    const customer = await Bucket.data.get(`${CUSTOMER_BUCKET_ID}`, `${card.customer}`);
+
+    await stripe.customers
+        .deleteSource(`${customer.stripe_customer_id}`, `${card.card_id}`)
+        .then(data => {
+            console.log("CARD DELETED", data);
+        })
+        .catch(error => {
+            console.log("ERROR WHILE DELETING CARD");
+        });
 }

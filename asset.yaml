@@ -28,6 +28,42 @@ spec:
         - done
         - error
 ---
+#CARD BUCKET
+apiVersion: bucket/v1
+kind: Schema
+metadata:
+  name: card
+spec:
+  title: ASSET-Card
+  description: Card of customers
+  required:
+    - customer
+    - token
+  acl:
+    write: "true==true"
+    read: "true=true"
+  properties:
+    customer:
+      type: relation
+      relationType: onetoone
+      description: who owns this card
+      bucket:
+        resourceFieldRef:
+          bucketName: customer
+    card_id:
+      type: string
+      description: DONT TOUCH, IT WILL BE FILLED AUTOMATICALLY
+    status:
+      type: string
+      description: DONT TOUCH, IT WILL BE FILLED AUTOMATICALLY
+      enum:
+        - creating
+        - done
+        - error
+    token:
+      type: string
+      description: token of the card
+---
 # PAYMENT METHOD BUCKET
 apiVersion: bucket/v1
 kind: Schema
@@ -76,8 +112,6 @@ spec:
     - name
   title: ASSET-Product
   description: ASSET-Product description
-  required:
-    - name
   acl:
     write: "true==true"
     read: "true=true"
@@ -116,6 +150,7 @@ spec:
   properties:
     product:
       type: relation
+      relationType: onetoone
       description: SELECT A PRODUCT FOR THIS PLAN
       bucket:
         resourceFieldRef:
@@ -164,16 +199,25 @@ spec:
   properties:
     customer:
       type: relation
+      relationType: onetoone
       description: SELECT WHEN - CHARGE -
       bucket:
         resourceFieldRef:
           bucketName: customer
     payment_method:
       type: relation
+      relationType: onetoone
       description: SELECT WHEN - SUBSCRIBE - AND CUSTOMER HAS NO DEFAULT PAYMENT
       bucket:
         resourceFieldRef:
           bucketName: payment-method
+    card:
+      type: relation
+      relationType: onetoone
+      description: SELECT WHEN - CHARGE WITH CUSTOMER CARD
+      bucket:
+        resourceFieldRef:
+          bucketName: card
     payment_type:
       type: string
       description: SELECT PAYMENT TYPE
@@ -201,6 +245,7 @@ spec:
         - error
     plan:
       type: relation
+      relationType: onetoone
       description: SELECT WHEN - SUBSCRIBE -
       bucket:
         resourceFieldRef:
@@ -347,6 +392,22 @@ spec:
     phase: AFTER
     type: INSERT
 ---
+# Card Trigger
+apiVersion: function/v1
+kind: Trigger
+metadata:
+  name: card-trigger
+spec:
+  name: card
+  func: stripe-function
+  type: bucket
+  bucketOptions:
+    bucket:
+      resourceFieldRef:
+        schemaName: card
+    phase: AFTER
+    type: INSERT
+---
 # Delete Payment Method
 apiVersion: function/v1
 kind: Trigger
@@ -408,5 +469,21 @@ spec:
     bucket:
       resourceFieldRef:
         schemaName: plan
+    phase: AFTER
+    type: DELETE
+---
+# Delete Card
+apiVersion: function/v1
+kind: Trigger
+metadata:
+  name: delete-card-trigger
+spec:
+  name: deleteCard
+  func: stripe-function
+  type: bucket
+  bucketOptions:
+    bucket:
+      resourceFieldRef:
+        schemaName: card
     phase: AFTER
     type: DELETE

@@ -8,23 +8,20 @@ async function __construct() {
     traceID = Math.random() * 10000000;
 }
 
-const stripe = require("stripe")(
-    "sk_test_51HX02AHC6Fal1mUZK1ATpv6YoxpWFR4S2csyiAoxBjWR26cHCcZQ2fi1RTspaZhEVPegHTMk2JjeWeBtcc41EPHP00JNfXpvt9"
-);
-
 //CONSTS
 const url = process.env.__INTERNAL__SPICA__PUBLIC_URL__;
-//const SECRET_API_KEY = process.env.SECRET_API_KEY;
-const SECRET_API_KEY = "ajjbym18ki4asz2m";
-const MARKET_BUCKET_ID = process.env.MARKET_BUCKET_ID;
-//const CUSTOMER_BUCKET_ID = process.env.CUSTOMER_BUCKET_ID;
-const CUSTOMER_BUCKET_ID = "5fc49f8ae33425002ce4a855";
-//const PAYMENT_METHOD_ID = process.env.PAYMENT_METHOD_ID;
-const PAYMENT_METHOD_ID = "5fc4a1d7e33425002ce4a859";
-const PAYMENT_BUCKET_ID = "5fc4be43e33425002ce4a937";
-const PRODUCT_BUCKET_ID = "5fc4eecde33425002ce4a9a0";
-const PLAN_BUCKET_ID = "5fc4f49ae33425002ce4a9b2";
-const CARD_BUCKET_ID = "5fe45d8bdfdd0f002c91f036";
+const SECRET_API_KEY = process.env.SECRET_API_KEY;
+
+const CUSTOMER_BUCKET_ID = process.env.CUSTOMER_BUCKET_ID;
+const PAYMENT_METHOD_ID = process.env.PAYMENT_METHOD_ID;
+const PAYMENT_BUCKET_ID = process.env.PAYMENT_BUCKET_ID;
+const PRODUCT_BUCKET_ID = process.env.PRODUCT_BUCKET_ID;
+const PLAN_BUCKET_ID = process.env.PLAN_BUCKET_ID;
+const CARD_BUCKET_ID = process.env.CARD_BUCKET_ID;
+
+const STRIPE_TEST = process.env.STRIPE_TEST;
+
+const stripe = require("stripe")(`${STRIPE_TEST}`);
 
 export async function payment(action) {
     //get data

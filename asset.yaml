@@ -304,6 +304,14 @@ spec:
       valueFrom:
         resourceFieldRef:
           schemaName: payment
+    - name: PLAN_BUCKET_ID
+      valueFrom:
+        resourceFieldRef:
+          schemaName: plan
+    - name: CARD_BUCKET_ID
+      valueFrom:
+        resourceFieldRef:
+          schemaName: card
   dependency:
     - name: "@spica-devkit/bucket"
       version: latest

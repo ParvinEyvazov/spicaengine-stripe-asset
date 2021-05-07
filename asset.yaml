@@ -4,8 +4,8 @@ kind: Schema
 metadata:
   name: customer
 spec:
-  title: ASSET-Customer
-  description: ASSET-Customer description
+  title: STRIPE-Customer
+  description: STRIPE-Customer description
   required:
     - email
   acl:
@@ -34,8 +34,8 @@ kind: Schema
 metadata:
   name: card
 spec:
-  title: ASSET-Card
-  description: Card of customers
+  title: STRIPE-Card
+  description: STRIPE-Card of customers
   required:
     - customer
     - token
@@ -70,8 +70,8 @@ kind: Schema
 metadata:
   name: payment-method
 spec:
-  title: ASSET-Payment Method
-  description: ASSET-Payment Method description
+  title: STRIPE-Payment Method
+  description: STRIPE-Payment Method description
   required:
     - payment_method_id
     - customer
@@ -110,8 +110,8 @@ metadata:
 spec:
   required:
     - name
-  title: ASSET-Product
-  description: ASSET-Product description
+  title: STRIPE-Product
+  description: STRIPE-Product description
   acl:
     write: "true==true"
     read: "true==true"
@@ -122,14 +122,14 @@ spec:
     status:
       type: string
       default: creating
-      description: DO NOT TOUCH!  IT WILL BE CHANGED AUTOMATICALLY!
+      description: DO NOT TOUCH! IT WILL BE CHANGED AUTOMATICALLY!
       enum:
         - creating
         - done
         - error
     product_id:
       type: string
-      description: DO NOT TOUCH!  IT WILL BE FILLED AUTOMATICALLY!
+      description: DO NOT TOUCH! IT WILL BE FILLED AUTOMATICALLY!
 ---
 # PLAN BUCKET
 apiVersion: bucket/v1
@@ -137,8 +137,8 @@ kind: Schema
 metadata:
   name: plan
 spec:
-  title: ASSET-Plan
-  description: ASSET-Plan description
+  title: STRIPE-Plan
+  description: STRIPE-Plan description
   required:
     - currency
     - interval
@@ -174,14 +174,14 @@ spec:
     status:
       type: string
       default: creating
-      description: DO NOT TOUCH!  IT WILL BE CHANGED AUTOMATICALLY!
+      description: DO NOT TOUCH! IT WILL BE CHANGED AUTOMATICALLY!
       enum:
         - creating
         - done
         - error
     price_id:
       type: string
-      description: DO NOT TOUCH!  IT WILL BE FILLED AUTOMATICALLY!
+      description: DO NOT TOUCH! IT WILL BE FILLED AUTOMATICALLY!
 ---
 # PAYMENT BUCKET
 apiVersion: bucket/v1
@@ -189,8 +189,8 @@ kind: Schema
 metadata:
   name: payment
 spec:
-  title: ASSET-Payment
-  description: ASSET-Payment description
+  title: STRIPE-Payment
+  description: STRIPE-Payment description
   required:
     - payment_type
   acl:
@@ -238,7 +238,7 @@ spec:
     status:
       type: string
       default: creating
-      description: DO NOT TOUCH!  IT WILL BE FILLED AUTOMATICALLY!
+      description: DO NOT TOUCH! IT WILL BE FILLED AUTOMATICALLY!
       enum:
         - creating
         - done
@@ -252,7 +252,7 @@ spec:
           schemaName: plan
     subscribe_id:
       type: string
-      description: DO NOT TOUCH!  IT WILL BE FILLED AUTOMATICALLY WHEN SUBSCRIBING.
+      description: DO NOT TOUCH! IT WILL BE FILLED AUTOMATICALLY WHEN SUBSCRIBING.
 ---
 # API KEY
 apiVersion: passport/v1

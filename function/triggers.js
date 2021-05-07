@@ -179,7 +179,7 @@ export async function deletePayment(action) {
 
 export async function deleteSubsciption(subscribe_id) {
   await stripe.subscriptions
-    .del(`${payment.subscribe_id}`, {
+    .del(`${subscribe_id}`, {
       prorate: true,
       invoice_now: true,
     })

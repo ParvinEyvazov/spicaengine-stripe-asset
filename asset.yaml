@@ -22,7 +22,7 @@ spec:
     status:
       type: string
       default: creating
-      description: DO NOT TOUCH!  IT WILL CHANGED AUTOMATICALLY!
+      description: DO NOT TOUCH!  IT WILL BE CHANGED AUTOMATICALLY!
       enum:
         - creating
         - done

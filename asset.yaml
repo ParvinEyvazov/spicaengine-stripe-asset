@@ -10,7 +10,7 @@ spec:
     - email
   acl:
     write: "true==true"
-    read: "true=true"
+    read: "true==true"
   properties:
     name:
       type: string
@@ -18,11 +18,11 @@ spec:
       type: string
     stripe_customer_id:
       type: string
-      description: DO NOT TOUCH!  IT WILL BE FILLED AUTOMATICALLY!
+      description: DO NOT TOUCH! IT WILL BE FILLED AUTOMATICALLY!
     status:
       type: string
       default: creating
-      description: DO NOT TOUCH!  IT WILL BE CHANGED AUTOMATICALLY!
+      description: DO NOT TOUCH! IT WILL BE CHANGED AUTOMATICALLY!
       enum:
         - creating
         - done
@@ -41,7 +41,7 @@ spec:
     - token
   acl:
     write: "true==true"
-    read: "true=true"
+    read: "true==true"
   properties:
     customer:
       type: relation
@@ -49,7 +49,7 @@ spec:
       description: who owns this card
       bucket:
         resourceFieldRef:
-          bucketName: customer
+          schemaName: customer
     card_id:
       type: string
       description: DONT TOUCH, IT WILL BE FILLED AUTOMATICALLY
@@ -77,7 +77,7 @@ spec:
     - customer
   acl:
     write: "true==true"
-    read: "true=true"
+    read: "true==true"
   properties:
     customer:
       type: relation
@@ -85,14 +85,14 @@ spec:
       description: SELECT THE CUSTOMER OF THIS PAYMENT METHOD!
       bucket:
         resourceFieldRef:
-          bucketName: customer
+          schemaName: customer
     payment_method_id:
       type: string
       description: WRITE PAYMENT METHOD ID OF THIS CUSTOMER
     status:
       type: string
       default: creating
-      description: DO NOT TOUCH!  IT WILL BE CHANGED AUTOMATICALLY!
+      description: DO NOT TOUCH! IT WILL BE CHANGED AUTOMATICALLY!
       enum:
         - creating
         - done
@@ -114,7 +114,7 @@ spec:
   description: ASSET-Product description
   acl:
     write: "true==true"
-    read: "true=true"
+    read: "true==true"
   properties:
     name:
       type: string
@@ -146,7 +146,7 @@ spec:
     - amount
   acl:
     write: "true==true"
-    read: "true=true"
+    read: "true==true"
   properties:
     product:
       type: relation
@@ -154,7 +154,7 @@ spec:
       description: SELECT A PRODUCT FOR THIS PLAN
       bucket:
         resourceFieldRef:
-          bucketName: product
+          schemaName: product
     interval:
       type: string
       default: month
@@ -195,7 +195,7 @@ spec:
     - payment_type
   acl:
     write: "true==true"
-    read: "true=true"
+    read: "true==true"
   properties:
     customer:
       type: relation
@@ -203,21 +203,21 @@ spec:
       description: SELECT WHEN - CHARGE -
       bucket:
         resourceFieldRef:
-          bucketName: customer
+          schemaName: customer
     payment_method:
       type: relation
       relationType: onetoone
       description: SELECT WHEN - SUBSCRIBE - AND CUSTOMER HAS NO DEFAULT PAYMENT
       bucket:
         resourceFieldRef:
-          bucketName: payment-method
+          schemaName: payment-method
     card:
       type: relation
       relationType: onetoone
       description: SELECT WHEN - CHARGE WITH CUSTOMER CARD
       bucket:
         resourceFieldRef:
-          bucketName: card
+          schemaName: card
     payment_type:
       type: string
       description: SELECT PAYMENT TYPE
@@ -249,7 +249,7 @@ spec:
       description: SELECT WHEN - SUBSCRIBE -
       bucket:
         resourceFieldRef:
-          bucketName: plan
+          schemaName: plan
     subscribe_id:
       type: string
       description: DO NOT TOUCH!  IT WILL BE FILLED AUTOMATICALLY WHEN SUBSCRIBING.

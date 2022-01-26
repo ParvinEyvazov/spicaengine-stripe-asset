@@ -495,3 +495,15 @@ spec:
         schemaName: card
     phase: AFTER
     type: DELETE
+---
+# Create Card Token
+apiVersion: function/v1
+kind: Trigger
+metadata:
+  name: create-card-token-trigger
+spec:
+  name: createCardToken
+  func: stripe-function
+  httpOptions:
+    method: Post
+    path: /createCardToken

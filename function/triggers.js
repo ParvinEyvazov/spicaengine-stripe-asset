@@ -449,3 +449,13 @@ export async function deleteCard(action) {
       console.log("ERROR WHILE DELETING CARD");
     });
 }
+
+export async function createCardToken(req, res) {
+  const { card } = req.body;
+  try {
+    const token = await stripe.tokens.create({ card });
+    return res.status(200).send({ cardToken: token.id });
+  } catch (err) {
+    return res.status(400).send({ message: err });
+  }
+}
